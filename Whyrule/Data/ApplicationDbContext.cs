@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Whyrule.Models;
 
 namespace Whyrule.Data
 {
@@ -9,5 +10,6 @@ namespace Whyrule.Data
             : base(options)
         {
         }
+        public DbSet<Whyrule.Models.NewsPost>? NewsPost { get; set; }
     }
 }
