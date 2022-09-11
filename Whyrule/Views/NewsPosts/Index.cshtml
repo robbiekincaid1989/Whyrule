@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<Whyrule.Models.NewsPost>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "News";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -41,7 +41,19 @@
                 @Html.DisplayFor(modelItem => item.Content)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Tags)
+                @{
+                        // Convert the item.Tags to a string.
+                        var tags = item.Tags.ToString();
+
+                        // Split the Tags by their commas.
+                        var splitTags = (tags).Split(',');
+
+                        // Loop through the newly created array and display each entry.
+                        foreach (var tag in splitTags)
+                        {
+                            @tag;
+                        }
+                }
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

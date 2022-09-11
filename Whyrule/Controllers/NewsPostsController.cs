@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -19,12 +21,31 @@ namespace Whyrule.Controllers
             _context = context;
         }
 
+        public string GetUserName()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Get user's ID.
+            var userName = User.FindFirstValue(ClaimTypes.Name);
+            return userName;
+        }
+
         // GET: NewsPosts
         public async Task<IActionResult> Index()
         {
               return _context.NewsPost != null ? 
                           View(await _context.NewsPost.ToListAsync()) :
                           Problem("Entity set 'ApplicationDbContext.NewsPost'  is null.");
+        }
+
+        // GET: NewsPosts/ShowSearchForm
+        public async Task<IActionResult> ShowSearchForm()
+        {
+            return View();
+        }
+
+        // POST: NewsPosts/ShowSearchResults
+        public async Task<IActionResult> ShowSearchResults(string SearchTerm)
+        {
+            return View("Index", await _context.NewsPost.Where(n => n.Title.Contains(SearchTerm)).ToListAsync());
         }
 
         // GET: NewsPosts/Details/5
@@ -46,6 +67,7 @@ namespace Whyrule.Controllers
         }
 
         // GET: NewsPosts/Create
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -54,9 +76,10 @@ namespace Whyrule.Controllers
         // POST: NewsPosts/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,PostDate,Content,Tags")] NewsPost newsPost)
+        public async Task<IActionResult> Create([Bind("Id,Title,PostDate,Content,Tags,Author")] NewsPost newsPost)
         {
             if (ModelState.IsValid)
             {
@@ -68,6 +91,7 @@ namespace Whyrule.Controllers
         }
 
         // GET: NewsPosts/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.NewsPost == null)
@@ -86,6 +110,7 @@ namespace Whyrule.Controllers
         // POST: NewsPosts/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,PostDate,Content,Tags")] NewsPost newsPost)
@@ -119,6 +144,7 @@ namespace Whyrule.Controllers
         }
 
         // GET: NewsPosts/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.NewsPost == null)
@@ -137,6 +163,7 @@ namespace Whyrule.Controllers
         }
 
         // POST: NewsPosts/Delete/5
+        [Authorize]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
